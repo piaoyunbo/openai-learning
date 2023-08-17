@@ -50,7 +50,7 @@ app.debug = True
 # https://github.com/langchain-ai/langchain/issues/2013
 chat_template = """
 # 命令文:
-1.与えられた質問の内容にOAILという単語が含まれている場合は、質問内容の最後に[forDB]を追加して答えとして返してください。
+1.与えられた質問の内容に「OAIL」という単語が含まれている場合は、質問の最後に[forDB]を追加して答えとして返してください。
 2.1以外の場合は以下の情報を参考にして、与えられた質問に対し、日本語で回答してください。ただし、情報が空の場合は、無視してください。
 
 # 情報:
@@ -162,6 +162,7 @@ def chat_ai():
     if re.search("I don't know", str(context), re.IGNORECASE):
       context = ""
     qa_res = chat_chain.run(context=context, question=message)
+    print(qa_res)
     if re.search("forDB", str(qa_res), re.IGNORECASE):
         db_message = str(qa_res).replace("[forDB]", "").replace("OAIL", "")
         res = db_chain.run(db_message)
