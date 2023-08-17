@@ -3,7 +3,6 @@
 OpenAI の練習用リポジトリです。  
 直接 OpenAI の API を使わずに langchain python を使っています。
 
-
 # 起動方法
 
 ```bash
@@ -12,6 +11,10 @@ docker-compose up --build
 # Database のリフレッシュを伴う起動
 docker-compose --profile provision up
 ```
+
+# ブラウザからChatを始める
+
+起動完了したら http://localhost:15000/ アクセスしてチャット開始してください。
 
 # Database のリフレッシュ
 
