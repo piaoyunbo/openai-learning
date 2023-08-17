@@ -1,0 +1,10 @@
+Flask==2.3.2
+Flask-Cors==4.0.0
+openai==0.27.8
+langchain
+langchain-experimental
+psycopg2-binary
+python-dotenv
+pypdf
+tiktoken
+chromadb

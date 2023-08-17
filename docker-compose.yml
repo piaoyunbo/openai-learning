@@ -1,0 +1,74 @@
+version: "3.8"
+
+x-template: &flyway-template
+  image: flyway/flyway:9.21.1
+  volumes:
+    - ./flyway/sql:/flyway/sql
+    - ./flyway/conf:/flyway/conf
+  networks:
+    oail:
+
+services:
+  oail:
+    container_name: oail
+    hostname: oail
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    networks:
+      oail:
+    ports:
+      - 15000:5000
+    volumes:
+      - ./:/app/
+    environment:
+      - TZ=Asia/Tokyo
+    
+  postgresql:
+    container_name: oail-postgresql
+    hostname: oail-postgresql
+    image: postgres:13-alpine3.18
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=oail
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - TZ=Asia/Tokyo
+    ports:
+      - 15432:5432
+    user: root
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "oail", "-U", "user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - oail-postgresql:/var/lib/postgresql
+    networks:
+      oail:
+
+  flyway-clean:
+    <<: *flyway-template
+    command: clean
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    profiles:
+      - provision
+
+  flyway-migrate:
+    <<: *flyway-template
+    command: migrate
+    depends_on:
+      flyway-clean:
+        condition: service_completed_successfully
+    profiles:
+      - provision
+
+networks:
+  oail:
+volumes:
+  oail-postgresql:
